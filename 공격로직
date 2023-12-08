@@ -1,0 +1,144 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct Character {
+    int hp;
+    int mp;
+    int atk;
+};
+
+void clearScreen() {
+    system("clear");
+}
+
+void playerAttack(struct Character *attacker, struct Character *target) {
+    printf("공격하였다. %d의 피해를 입혔다.\n", attacker->atk);
+    target->hp -= attacker->atk;
+    printf("적의 남은 체력: %d\n", target->hp);  
+    printf("나의 남은 체력: %d\n", attacker->hp);  
+}
+
+void s_Attack(struct Character *attacker, struct Character *target) {
+    printf("공격하였다. %d의 피해를 입혔다.\n", attacker->atk*2);
+    target->hp -= attacker->atk*2;
+    
+}
+
+
+void enemyAttack(struct Character *attacker, struct Character *target) {
+    printf("공격받았다. %d의 피해를 받았다.\n", attacker->atk);
+    target->hp -= attacker->atk;
+}
+
+int main() {
+    struct Character player = {100, 100, 10} ;
+    struct Character enemy ;
+    struct Character companion = {0, 0, 0};
+    int rrun = 0;
+
+    enemy.hp = 100 + (rand() % 10);
+    enemy.mp = 100;
+    enemy.atk = 10 + (rand() % 5);
+
+
+
+    int hasRecruited = 0;
+
+    while (player.hp > 0 && enemy.hp > 0) {
+        int choice;
+        printf("1. 플레이어 공격 2. 플레이어 특수공격 3. 플레이어 도구함 4. 플레이어 도망\n");
+        
+        if (hasRecruited) {
+            printf("5. 동료 공격 6. 동료 특수공격 7. 동료 도구함\n");
+        }
+        
+        scanf("%d", &choice);
+        // system("clear");
+
+        switch (choice) {
+            case 1:
+                playerAttack(&player, &enemy);
+                break;
+
+            case 2:
+                s_Attack(&player, &enemy);
+                break;
+
+            case 3:
+                printf("플레이어: 도구함을 열었습니다.\n");
+                break;
+
+            case 4:
+                printf("도망을 시도합니다.\n");
+                int run = rand()%100;
+                if (run < 50)
+                {
+                    printf("도망에 성공합니다.\n");
+                    rrun == 1;
+                    return 0;
+                }
+                else
+                    printf("도망에 실패했습니다. 전투를 이어갑니다\n");
+                    continue;
+
+            case 5:
+                if (hasRecruited) {
+                    playerAttack(&companion, &enemy);
+                } else {
+                    printf("동료가 없습니다.\n");
+                }
+                break;
+
+            case 6:
+                if (hasRecruited) {
+                    playerAttack(&companion, &enemy);
+                } else {
+                    printf("동료가 없습니다.\n");
+                }
+                break;
+
+            case 7:
+                if (hasRecruited) {
+                    printf("동료: 도구함을 열었습니다.\n");
+                } else {
+                    printf("동료가 없습니다.\n");
+                }
+                break;
+
+            default:
+                printf("잘못된 선택입니다. 다시 선택하세요.\n");
+                break;
+        }
+
+
+        if (enemy.hp <= 0 && !hasRecruited) {
+            printf("\n적을 처치하였습니다! 남은 체력: %d\n", player.hp);
+            printf("동료로 영입하겠습니까? (1. 예 2. 아니오)\n");
+            int recruitChoice;
+            scanf("%d", &recruitChoice);
+
+            if (recruitChoice == 1) {
+                printf("적을 동료로 영입했습니다!\n");
+                companion = enemy;
+                hasRecruited = 1;
+            }
+        }
+
+        if (player.hp > 0 && enemy.hp > 0) {
+            enemyAttack(&enemy, &player);
+        }
+    }
+
+    if (player.hp > 0) {
+        printf("전투에서 승리하였습니다! 남은 체력: %d\n", player.hp);
+        if (hasRecruited) {
+            printf("동료 정보 - 체력: %d, 마나: %d, 공격력: %d\n", companion.hp, companion.mp, companion.atk);
+        }
+    } else {
+        printf("전투에서 패배하였습니다. 남은 체력: %d\n", player.hp);
+    }
+
+    return 0;
+}
+
